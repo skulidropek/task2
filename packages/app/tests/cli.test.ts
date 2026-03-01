@@ -40,9 +40,46 @@ describe("parseCliArgs", () => {
     expect(result).toEqual({ kind: "help" })
   })
 
+  it("parses tui mode without target path", () => {
+    const result = parseCliArgs(["--tui"])
+    expect(result).toEqual({
+      kind: "tui",
+      options: {
+        filePath: undefined
+      }
+    })
+  })
+
+  it("parses tui mode with target path", () => {
+    const result = parseCliArgs(["--tui", "./notes.md"])
+    expect(result).toEqual({
+      kind: "tui",
+      options: {
+        filePath: "./notes.md"
+      }
+    })
+  })
+
+  it("parses tui args with leading double-dash separator", () => {
+    const result = parseCliArgs(["--", "--tui", "./scratch.txt"])
+
+    expect(result).toEqual({
+      kind: "tui",
+      options: {
+        filePath: "./scratch.txt"
+      }
+    })
+  })
+
   it("fails on unknown option", () => {
     expect(() => parseCliArgs(["./file.txt", "--wat"])).toThrow(
       "Unknown option: --wat"
+    )
+  })
+
+  it("fails when tui mode receives unsupported option", () => {
+    expect(() => parseCliArgs(["--tui", "--lines", "20"])).toThrow(
+      "Unexpected option for --tui mode: --lines"
     )
   })
 })

@@ -1,5 +1,6 @@
 import { Effect } from "effect"
 
+import { openNotepad } from "../core/notepad.js"
 import { viewFile } from "../core/viewer.js"
 import { parseCliArgs, printHelp } from "../shell/cli.js"
 
@@ -15,6 +16,11 @@ export const runCli = (args: ReadonlyArray<string>) =>
 
     if (command.kind === "help") {
       stdoutSink.write(printHelp())
+      return
+    }
+
+    if (command.kind === "tui") {
+      yield* _(openNotepad(command.options))
       return
     }
 

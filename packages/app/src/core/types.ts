@@ -24,3 +24,13 @@ export interface ViewResult {
 export interface OutputSink {
   readonly write: (chunk: string) => void
 }
+
+export interface NotepadOptions {
+  readonly filePath: string | undefined
+}
+
+export interface NotepadResult {
+  readonly filePath: string | undefined
+  readonly saved: boolean
+  readonly bytesWritten: number | undefined
+}

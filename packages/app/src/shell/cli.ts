@@ -3,6 +3,7 @@ import {
   DEFAULT_FROM,
   DEFAULT_LINES,
   MEMORY_LIMIT_BYTES,
+  type NotepadOptions,
   type ViewerOptions
 } from "../core/types.js"
 
@@ -13,6 +14,10 @@ export type CliCommand =
   | {
     readonly kind: "run"
     readonly options: ViewerOptions
+  }
+  | {
+    readonly kind: "tui"
+    readonly options: NotepadOptions
   }
 
 interface ParseState {
@@ -210,6 +215,28 @@ const toViewerOptions = (state: ParseState): ViewerOptions => {
   }
 }
 
+const parseTuiArgs = (args: ReadonlyArray<string>): NotepadOptions => {
+  const filePath = args[1]
+  if (filePath === undefined) {
+    return {
+      filePath: undefined
+    }
+  }
+
+  if (filePath.startsWith("--")) {
+    throw new Error(`Unexpected option for --tui mode: ${filePath}`)
+  }
+
+  const extraArgument = args[2]
+  if (extraArgument !== undefined) {
+    throw new Error(`Unexpected argument for --tui mode: ${extraArgument}`)
+  }
+
+  return {
+    filePath
+  }
+}
+
 const parseLoopStep = (
   args: ReadonlyArray<string>,
   index: number,
@@ -268,6 +295,7 @@ const parseLoopStep = (
 export const printHelp = (): string =>
   `Usage:
   viewer <file-path> [--from <line>] [--lines <count>] [--tail] [--encoding <name>] [--no-auto-encoding] [--chunk-kb <size>]
+  viewer --tui [file-path]
 
 Options:
   --from <line>         First line to print in forward mode (1-based, default: ${DEFAULT_FROM})
@@ -276,19 +304,29 @@ Options:
   --encoding <name>     Force text encoding (iconv-lite names)
   --no-auto-encoding    Disable heuristic auto detection and use UTF-8 when encoding isn't passed
   --chunk-kb <size>     Read chunk size in KB (default: ${DEFAULT_CHUNK_SIZE_KB})
+  --tui [file-path]     Start interactive TUI notepad (Ctrl+S save, Ctrl+Q quit)
   --help, -h            Show this help message
 `
 
 export const parseCliArgs = (args: ReadonlyArray<string>): CliCommand => {
-  if (args.length === 0) {
+  const normalizedArgs = args[0] === "--" ? args.slice(1) : args
+
+  if (normalizedArgs.length === 0) {
     return { kind: "help" }
+  }
+
+  if (normalizedArgs[0] === "--tui") {
+    return {
+      kind: "tui",
+      options: parseTuiArgs(normalizedArgs)
+    }
   }
 
   let index = 0
   let state = initialState
 
-  while (index < args.length) {
-    const nextStep = parseLoopStep(args, index, state)
+  while (index < normalizedArgs.length) {
+    const nextStep = parseLoopStep(normalizedArgs, index, state)
     if (nextStep.command !== undefined) {
       return nextStep.command
     }
