@@ -9,18 +9,16 @@ const stdoutSink = {
   }
 }
 
-export const runCli = async (args: ReadonlyArray<string>): Promise<void> => {
-  const command = parseCliArgs(args)
+export const runCli = (args: ReadonlyArray<string>) =>
+  Effect.gen(function*(_) {
+    const command = parseCliArgs(args)
 
-  if (command.kind === "help") {
-    process.stdout.write(printHelp())
-    return
-  }
+    if (command.kind === "help") {
+      stdoutSink.write(printHelp())
+      return
+    }
 
-  await viewFile(command.options, stdoutSink)
-}
+    yield* _(viewFile(command.options, stdoutSink))
+  })
 
-export const program = Effect.tryPromise({
-  try: () => runCli(process.argv.slice(2)),
-  catch: (error) => error instanceof Error ? error : new Error(`Unexpected failure: ${String(error)}`)
-})
+export const program = runCli(process.argv.slice(2))

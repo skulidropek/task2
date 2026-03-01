@@ -35,23 +35,19 @@ const runViewFile = (
     readonly memoryLimitBytes: number
   }
 ) =>
-  Effect.tryPromise({
-    try: () =>
-      viewFile(
-        {
-          filePath,
-          lines: options.lines,
-          from: options.from,
-          tail: options.tail,
-          explicitEncoding: options.explicitEncoding,
-          autoDetectEncoding: options.autoDetectEncoding,
-          chunkSizeBytes: options.chunkSizeBytes,
-          memoryLimitBytes: options.memoryLimitBytes
-        },
-        sink
-      ),
-    catch: (cause) => new Error(String(cause))
-  })
+  viewFile(
+    {
+      filePath,
+      lines: options.lines,
+      from: options.from,
+      tail: options.tail,
+      explicitEncoding: options.explicitEncoding,
+      autoDetectEncoding: options.autoDetectEncoding,
+      chunkSizeBytes: options.chunkSizeBytes,
+      memoryLimitBytes: options.memoryLimitBytes
+    },
+    sink
+  )
 
 type RunViewFileOptions = Parameters<typeof runViewFile>[2]
 

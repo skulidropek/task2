@@ -24,19 +24,13 @@ const withStdoutCapture = Effect.acquireRelease(
     })
 )
 
-const runCliEffect = (args: ReadonlyArray<string>) =>
-  Effect.tryPromise({
-    try: () => runCli(args),
-    catch: (cause) => new Error(String(cause))
-  })
-
 describe("main program", () => {
   it.effect("prints help when arguments are not provided", () =>
     Effect.scoped(
       Effect.gen(function*(_) {
         const capture = yield* _(withStdoutCapture)
 
-        yield* _(runCliEffect([]))
+        yield* _(runCli([]))
 
         yield* _(
           Effect.sync(() => {
@@ -55,9 +49,7 @@ describe("main program", () => {
           withTempFile("program-tests", "sample.txt", "line-1\nline-2\nline-3\nline-4\n")
         )
 
-        yield* _(
-          runCliEffect([filePath, "--from", "2", "--lines", "2", "--no-auto-encoding"])
-        )
+        yield* _(runCli([filePath, "--from", "2", "--lines", "2", "--no-auto-encoding"]))
 
         yield* _(
           Effect.sync(() => {

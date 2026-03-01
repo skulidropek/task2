@@ -22,5 +22,5 @@ export interface ViewResult {
 }
 
 export interface OutputSink {
-  write: (chunk: string) => void | Promise<void>
+  readonly write: (chunk: string) => void
 }
