@@ -31,23 +31,23 @@ const mapDetectedEncoding = (detected: string): string => {
 }
 
 const detectBomEncoding = (sample: Buffer): string | undefined => {
-  if (sample.length >= 3 && sample[0] === 0xef && sample[1] === 0xbb && sample[2] === 0xbf) {
+  if (sample.length >= 3 && sample[0] === 0xEF && sample[1] === 0xBB && sample[2] === 0xBF) {
     return "utf8"
   }
 
-  if (sample.length >= 4 && sample[0] === 0x00 && sample[1] === 0x00 && sample[2] === 0xfe && sample[3] === 0xff) {
+  if (sample.length >= 4 && sample[0] === 0x00 && sample[1] === 0x00 && sample[2] === 0xFE && sample[3] === 0xFF) {
     return "utf32be"
   }
 
-  if (sample.length >= 4 && sample[0] === 0xff && sample[1] === 0xfe && sample[2] === 0x00 && sample[3] === 0x00) {
+  if (sample.length >= 4 && sample[0] === 0xFF && sample[1] === 0xFE && sample[2] === 0x00 && sample[3] === 0x00) {
     return "utf32le"
   }
 
-  if (sample.length >= 2 && sample[0] === 0xff && sample[1] === 0xfe) {
+  if (sample.length >= 2 && sample[0] === 0xFF && sample[1] === 0xFE) {
     return "utf16le"
   }
 
-  if (sample.length >= 2 && sample[0] === 0xfe && sample[1] === 0xff) {
+  if (sample.length >= 2 && sample[0] === 0xFE && sample[1] === 0xFF) {
     return "utf16be"
   }
 
@@ -125,20 +125,20 @@ export const newlinePatternForEncoding = (encoding: string): Buffer => {
   const normalized = normalizeEncoding(encoding).replaceAll("-", "")
 
   if (normalized === "utf16le" || normalized === "ucs2" || normalized === "ucs2le") {
-    return Buffer.from([0x0a, 0x00])
+    return Buffer.from([0x0A, 0x00])
   }
 
   if (normalized === "utf16be" || normalized === "ucs2be") {
-    return Buffer.from([0x00, 0x0a])
+    return Buffer.from([0x00, 0x0A])
   }
 
   if (normalized === "utf32le") {
-    return Buffer.from([0x0a, 0x00, 0x00, 0x00])
+    return Buffer.from([0x0A, 0x00, 0x00, 0x00])
   }
 
   if (normalized === "utf32be") {
-    return Buffer.from([0x00, 0x00, 0x00, 0x0a])
+    return Buffer.from([0x00, 0x00, 0x00, 0x0A])
   }
 
-  return Buffer.from([0x0a])
+  return Buffer.from([0x0A])
 }

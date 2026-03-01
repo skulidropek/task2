@@ -8,12 +8,12 @@ import {
 
 export type CliCommand =
   | {
-      readonly kind: "help"
-    }
+    readonly kind: "help"
+  }
   | {
-      readonly kind: "run"
-      readonly options: ViewerOptions
-    }
+    readonly kind: "run"
+    readonly options: ViewerOptions
+  }
 
 const parsePositiveInt = (raw: string, flag: string): number => {
   const parsed = Number.parseInt(raw, 10)
@@ -56,7 +56,8 @@ const extractFlagValue = (
   }
 }
 
-export const printHelp = (): string => `Usage:
+export const printHelp = (): string =>
+  `Usage:
   viewer <file-path> [--from <line>] [--lines <count>] [--tail] [--encoding <name>] [--no-auto-encoding] [--chunk-kb <size>]
 
 Options:

@@ -4,7 +4,7 @@ import { open } from "node:fs/promises"
 import iconv from "iconv-lite"
 
 import { newlinePatternForEncoding, resolveEncoding } from "./encoding.js"
-import type { OutputSink, ViewResult, ViewerOptions } from "./types.js"
+import type { OutputSink, ViewerOptions, ViewResult } from "./types.js"
 
 const SAFETY_MARGIN_BYTES = 1 * 1024 * 1024
 
@@ -18,7 +18,7 @@ const stripCarriageReturn = (line: string): string =>
 const splitLines = (text: string): ReadonlyArray<string> => {
   const rawLines = text.split("\n").map((line) => stripCarriageReturn(line))
 
-  if (rawLines.length > 0 && rawLines[rawLines.length - 1] === "") {
+  if (rawLines.length > 0 && rawLines.at(-1) === "") {
     return rawLines.slice(0, Math.max(rawLines.length - 1, 0))
   }
 
@@ -47,8 +47,8 @@ const countPattern = (haystack: Buffer, needle: Buffer): number => {
   if (needle.length === 1) {
     let count = 0
     const byte = needle[0]
-    for (let index = 0; index < haystack.length; index += 1) {
-      if (haystack[index] === byte) {
+    for (const element of haystack) {
+      if (element === byte) {
         count += 1
       }
     }
@@ -192,7 +192,7 @@ const viewTail = async (
     let bytesRead = 0
     let bufferedBytes = 0
     let newlineCount = 0
-    const bufferedChunks: Buffer[] = []
+    const bufferedChunks: Array<Buffer> = []
     let nextChunkPrefix = Buffer.alloc(0)
 
     while (offset > 0 && newlineCount <= options.lines) {
@@ -221,12 +221,11 @@ const viewTail = async (
       }
     }
 
-    const merged =
-      bufferedChunks.length === 0
-        ? Buffer.alloc(0)
-        : bufferedChunks.length === 1
-          ? bufferedChunks[0]!
-          : Buffer.concat(bufferedChunks)
+    const merged = bufferedChunks.length === 0
+      ? Buffer.alloc(0)
+      : (bufferedChunks.length === 1
+        ? bufferedChunks[0]!
+        : Buffer.concat(bufferedChunks))
     const decoded = iconv.decode(merged, encoding)
     const lines = splitLines(decoded)
     const startIndex = Math.max(lines.length - options.lines, 0)

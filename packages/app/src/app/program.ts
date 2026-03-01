@@ -22,6 +22,5 @@ export const runCli = async (args: ReadonlyArray<string>): Promise<void> => {
 
 export const program = Effect.tryPromise({
   try: () => runCli(process.argv.slice(2)),
-  catch: (error) =>
-    error instanceof Error ? error : new Error(`Unexpected failure: ${String(error)}`)
+  catch: (error) => error instanceof Error ? error : new Error(`Unexpected failure: ${String(error)}`)
 })

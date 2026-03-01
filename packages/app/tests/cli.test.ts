@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import {
-  DEFAULT_CHUNK_SIZE_KB,
-  DEFAULT_LINES,
-  MEMORY_LIMIT_BYTES
-} from "../src/core/types.js"
+import { DEFAULT_CHUNK_SIZE_KB, DEFAULT_LINES, MEMORY_LIMIT_BYTES } from "../src/core/types.js"
 import { parseCliArgs } from "../src/shell/cli.js"
 
 describe("parseCliArgs", () => {
